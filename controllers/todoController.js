@@ -1,6 +1,8 @@
 import todoModel from "../models/todoModel.js"
 export async function createTodo(req,res) {
     try {
+        console.log(req.body,"this is body ");
+        
         const {title ,description,status,userId,priority,dueDate} = req.body
         if(!title||!dueDate){
            return res.status(400).json({message:"please fill the  filed Due date and title"})
@@ -9,12 +11,17 @@ export async function createTodo(req,res) {
             return res.status(401).json({message:"user not found"})
         }
 
-        const newTodo = await todoModel.create({title,description,status,userId,priority,dueDate});
+        const newTodo = await todoModel.create({title,description,status,user:userId,priority,dueDate});
+        if(!newTodo){
+            console.log();
+            
+            return res.status(401).json({message:"user not found"}) 
+        }
         return res.status(201).json({message:"new todo created successfully",newTodo})
 
         
     } catch (error) {
-        return res.status(201).json({message:error.message})
+        return res.status(500).json({message:error.message})
     }
     
 }
@@ -27,9 +34,9 @@ export async function updateTodo(req,res) {
             return res.status(400).json({message:"title and due data is required"})
         }
         const editTodo = await todoModel.findByIdAndUpdate(id,{title,description,status,priority,dueDate})
-        if(!editTodo){
-            return res.status(404).json({message:"user not fount"});
-        }
+        // if(!editTodo){
+        //     return res.status(404).json({message:"user not fount"});
+        // }
        res.status(200).json({message:"todo updated successfully",editTodo})
         
     } catch (error) {
